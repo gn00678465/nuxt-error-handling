@@ -85,5 +85,14 @@
     "pcss",
     "postcss"
   ],
-  "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+  "chat.promptFilesLocations": {
+    ".github/prompts": true, // 專案特定的 prompts
+    ".github/copilot-common/prompts": true // 通用的 prompts
+  },
+  "github.copilot.chat.commitMessageGeneration.instructions": [
+    {
+      "file": ".github/copilot-common/instructions/commit-message-generation.instructions.md"
+    }
+  ]
 }
