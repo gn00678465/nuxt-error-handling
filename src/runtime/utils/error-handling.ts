@@ -86,16 +86,36 @@ export interface NormalizedError<T = unknown> {
 }
 
 /**
+ * 錯誤轉換回調函式類型
+ */
+export type ErrorTransformCallback<T = unknown, R = NormalizedError<T>> = (
+  normalized: NormalizedError<T>,
+) => R
+
+/**
  * 將錯誤物件標準化為統一格式
  */
-export function normalizeError<T = unknown>(error: unknown): NormalizedError<T> {
+export function normalizeError<T = unknown>(error: unknown): NormalizedError<T>
+/**
+ * 將錯誤物件標準化為統一格式，並可選擇性轉換為自訂格式
+ */
+export function normalizeError<T = unknown, R = NormalizedError<T>>(
+  error: unknown,
+  transform: ErrorTransformCallback<T, R>,
+): R
+export function normalizeError<T = unknown, R = NormalizedError<T>>(
+  error: unknown,
+  transform?: ErrorTransformCallback<T, R>,
+): NormalizedError<T> | R {
+  let normalized: NormalizedError<T>
+
   // 處理 FetchError
   if (isFetchError<T>(error)) {
     const statusCode = error.status ?? error.response?.status
     const statusMessage = error.statusText ?? error.response?.statusText ?? error.message
     const data = error.data ?? error.response?._data
 
-    return {
+    normalized = {
       cause: error.cause,
       data,
       message: error.message,
@@ -105,13 +125,12 @@ export function normalizeError<T = unknown>(error: unknown): NormalizedError<T> 
       statusMessage,
     }
   }
-
   // 處理 NuxtError
-  if (isNuxtError<T>(error)) {
+  else if (isNuxtError<T>(error)) {
     const err = error as unknown as Record<string, unknown> & Error
     const statusCode = (typeof err.statusCode === 'number' ? err.statusCode : typeof err.status === 'number' ? err.status : undefined)
 
-    return {
+    normalized = {
       cause: err.cause,
       data: err.data as T,
       message: error.message,
@@ -121,12 +140,11 @@ export function normalizeError<T = unknown>(error: unknown): NormalizedError<T> 
       statusMessage: typeof err.statusMessage === 'string' ? err.statusMessage : error.message,
     }
   }
-
   // 處理標準 Error
-  if (error instanceof Error) {
+  else if (error instanceof Error) {
     const err = error as unknown as Record<string, unknown> & Error
 
-    return {
+    normalized = {
       cause: err.cause,
       data: undefined,
       message: error.message,
@@ -136,7 +154,11 @@ export function normalizeError<T = unknown>(error: unknown): NormalizedError<T> 
       statusMessage: undefined,
     }
   }
-
   // 處理未知錯誤
-  throw error
+  else {
+    throw error
+  }
+
+  // 如果提供了轉換函式，則使用它轉換標準化後的錯誤
+  return transform ? transform(normalized) : normalized
 }

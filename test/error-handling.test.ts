@@ -401,5 +401,201 @@ describe('error-handling utilities', () => {
         })
       })
     })
+
+    describe('transform 回調函式', () => {
+      it('應該在不提供 transform 時返回標準化格式', () => {
+        const error = new Error('Test error')
+        const normalized = normalizeError(error)
+
+        expect(normalized).toEqual({
+          cause: undefined,
+          data: undefined,
+          message: 'Test error',
+          name: 'Error',
+          stack: error.stack,
+          statusCode: undefined,
+          statusMessage: undefined,
+        })
+      })
+
+      it('應該使用 transform 函式轉換 FetchError', () => {
+        interface ApiResponse {
+          success: boolean
+          error: {
+            code: number
+            message: string
+          }
+        }
+
+        const fetchError = Object.assign(new Error('API Error'), {
+          request: '/api/test',
+          options: {},
+          status: 404,
+          data: { detail: 'Not found' },
+        })
+
+        const result = normalizeError<unknown, ApiResponse>(
+          fetchError,
+          normalized => ({
+            success: false,
+            error: {
+              code: normalized.statusCode ?? 500,
+              message: normalized.message,
+            },
+          }),
+        )
+
+        expect(result).toEqual({
+          success: false,
+          error: {
+            code: 404,
+            message: 'API Error',
+          },
+        })
+      })
+
+      it('應該使用 transform 函式轉換 NuxtError', () => {
+        interface CustomErrorFormat {
+          errorCode: number
+          errorMessage: string
+          timestamp: string
+        }
+
+        const nuxtError = Object.assign(new Error('Page not found'), {
+          statusCode: 404,
+          statusMessage: 'Not Found',
+        })
+
+        const result = normalizeError<unknown, CustomErrorFormat>(
+          nuxtError,
+          normalized => ({
+            errorCode: normalized.statusCode ?? 500,
+            errorMessage: normalized.statusMessage ?? normalized.message,
+            timestamp: '2025-01-01T00:00:00Z',
+          }),
+        )
+
+        expect(result).toEqual({
+          errorCode: 404,
+          errorMessage: 'Not Found',
+          timestamp: '2025-01-01T00:00:00Z',
+        })
+      })
+
+      it('應該使用 transform 函式轉換標準 Error', () => {
+        interface SimpleError {
+          msg: string
+          type: string
+        }
+
+        const error = new Error('Something went wrong')
+        error.name = 'TypeError'
+
+        const result = normalizeError<unknown, SimpleError>(
+          error,
+          normalized => ({
+            msg: normalized.message,
+            type: normalized.name,
+          }),
+        )
+
+        expect(result).toEqual({
+          msg: 'Something went wrong',
+          type: 'TypeError',
+        })
+      })
+
+      it('應該在 transform 中存取所有標準化屬性', () => {
+        const fetchError = Object.assign(new Error('Fetch failed'), {
+          request: '/api/test',
+          options: {},
+          response: {
+            status: 500,
+            statusText: 'Internal Server Error',
+            _data: { error: 'Server error' },
+          },
+          status: 500,
+          statusText: 'Internal Server Error',
+          data: { error: 'Server error' },
+          stack: 'Error stack',
+        })
+
+        const result = normalizeError(fetchError, (normalized) => {
+          // 驗證所有屬性都可以在 transform 中存取
+          expect(normalized.message).toBe('Fetch failed')
+          expect(normalized.name).toBe('Error')
+          expect(normalized.statusCode).toBe(500)
+          expect(normalized.statusMessage).toBe('Internal Server Error')
+          expect(normalized.data).toEqual({ error: 'Server error' })
+          expect(normalized.stack).toBe('Error stack')
+
+          return {
+            fullError: normalized,
+          }
+        })
+
+        expect(result).toHaveProperty('fullError')
+        expect(result.fullError.message).toBe('Fetch failed')
+      })
+
+      it('應該支援複雜的轉換邏輯', () => {
+        interface DetailedApiError {
+          status: 'error'
+          code: number
+          title: string
+          detail?: string
+          meta?: {
+            stackTrace?: string
+            errorName: string
+          }
+        }
+
+        const error = Object.assign(new Error('Validation failed'), {
+          statusCode: 400,
+          data: { field: 'email', issue: 'invalid format' },
+        })
+
+        const result = normalizeError<unknown, DetailedApiError>(
+          error,
+          normalized => ({
+            status: 'error',
+            code: normalized.statusCode ?? 500,
+            title: normalized.message,
+            detail: normalized.data ? JSON.stringify(normalized.data) : undefined,
+            meta: {
+              stackTrace: normalized.stack,
+              errorName: normalized.name,
+            },
+          }),
+        )
+
+        expect(result).toEqual({
+          status: 'error',
+          code: 400,
+          title: 'Validation failed',
+          detail: JSON.stringify({ field: 'email', issue: 'invalid format' }),
+          meta: {
+            stackTrace: error.stack,
+            errorName: 'Error',
+          },
+        })
+      })
+
+      it('應該在 transform 中處理 undefined 值', () => {
+        const error = new Error('Simple error')
+
+        const result = normalizeError(error, normalized => ({
+          hasStatusCode: normalized.statusCode !== undefined,
+          hasData: normalized.data !== undefined,
+          message: normalized.message || 'Unknown error',
+        }))
+
+        expect(result).toEqual({
+          hasStatusCode: false,
+          hasData: false,
+          message: 'Simple error',
+        })
+      })
+    })
   })
 })
