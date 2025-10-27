@@ -5,9 +5,9 @@ import type { NuxtError } from '#app'
  * 驗證錯誤類型並返回是否為有效錯誤
  * 如果不是任何已知錯誤類型，則拋出錯誤
  */
-export function validateError(error: unknown): boolean {
-  if (isFetchError(error)) return true
-  if (isNuxtError(error)) return true
+export function validateError<T = unknown>(error: unknown): boolean {
+  if (isFetchError<T>(error)) return true
+  if (isNuxtError<T>(error)) return true
   if (error instanceof Error) return true
 
   throw error
