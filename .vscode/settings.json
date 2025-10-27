@@ -94,5 +94,9 @@
     {
       "file": ".github/copilot-common/instructions/commit-message-generation.instructions.md"
     }
+  ],
+  "cSpell.words": [
+    "nuxi",
+    "nuxtjs"
   ]
 }
