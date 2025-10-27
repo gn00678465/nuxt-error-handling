@@ -1,18 +1,28 @@
 <script setup lang="ts">
 import { useMutation } from '@tanstack/vue-query'
 
+const { $validateError, $normalizeError } = useNuxtApp()
+const { errorHandler, validateError } = useErrorHandling({
+  handlers: {
+    DEFAULT(errorData) {
+      console.log("🚀 ~ DEFAULT error handler:", errorData)
+    },
+  }
+})
+
 const { data, error, refresh } = await useAsyncData('error-example', async () => {
   return await $fetch('https://dummyjson.com/http/404/Hello_Peter', {
     retry: 0,
     method: 'GET',
   }).catch((error) => {
-    console.log("🚀 ~ Caught an error during fetch:", error)
-    console.log("🚀 ~ Error details:", {
-      message: error.message,
-      statusCode: error.statusCode,
-      data: error.data,
-      name: error.name,
-    })
+    if ($validateError<any>(error)) {
+      const normalizedError = $normalizeError(error)
+      throw createError({
+        ...normalizedError,
+        message: `Custom Error Message: ${normalizedError.message}`,
+        fatal: true
+      })
+    }
     throw error
   })
 }, {
@@ -28,14 +38,22 @@ const { mutate } = useMutation({
     })
   },
   onError: (error) => {
-
+    if (validateError<any>(error)) {
+      const normalizedError = $normalizeError(error)
+      console.log("🚀 ~ Mutation normalized error:", normalizedError)
+      errorHandler(error, {
+        400: (errorData) => {
+          console.log("🚀 ~ 400 error handler in Mutation:", errorData)
+        }
+      })
+    }
   },
 })
 
 if (error.value) {
   console.log("🚀 ~ nuxt error is instanceof Error:", error.value instanceof Error)
   console.log("🚀 ~ nuxt error is:", error.value)
-
+  errorHandler(error.value)
 }
 </script>
 
