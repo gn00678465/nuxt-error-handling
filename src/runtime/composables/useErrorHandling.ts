@@ -21,10 +21,8 @@ export function useErrorHandling<TDefault = unknown>(options: UseErrorHandlingOp
       }
 
       // 如果沒有匹配的狀態碼處理器，使用 DEFAULT
-      if ('DEFAULT' in newHandlers) {
-        newHandlers.DEFAULT?.(data.data)
-        return
-      }
+      newHandlers.DEFAULT?.(data.data)
+      return
     }
     throw error
   }
