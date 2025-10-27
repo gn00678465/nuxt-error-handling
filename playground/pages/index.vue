@@ -5,9 +5,9 @@ const { $validateError, $normalizeError } = useNuxtApp()
 const { errorHandler, validateError } = useErrorHandling({
   handlers: {
     DEFAULT(errorData) {
-      console.log("🚀 ~ DEFAULT error handler:", errorData)
+      console.log('🚀 ~ DEFAULT error handler:', errorData)
     },
-  }
+  },
 })
 
 const { data, error, refresh } = await useAsyncData('error-example', async () => {
@@ -15,19 +15,19 @@ const { data, error, refresh } = await useAsyncData('error-example', async () =>
     retry: 0,
     method: 'GET',
   }).catch((error) => {
-    if ($validateError<any>(error)) {
+    if ($validateError<unknown>(error)) {
       const normalizedError = $normalizeError(error)
       throw createError({
         ...normalizedError,
         message: `Custom Error Message: ${normalizedError.message}`,
-        fatal: true
+        fatal: true,
       })
     }
     throw error
   })
 }, {
   server: true,
-  lazy: true
+  lazy: true,
 })
 
 const { mutate } = useMutation({
@@ -38,21 +38,21 @@ const { mutate } = useMutation({
     })
   },
   onError: (error) => {
-    if (validateError<any>(error)) {
+    if (validateError<unknown>(error)) {
       const normalizedError = $normalizeError(error)
-      console.log("🚀 ~ Mutation normalized error:", normalizedError)
+      console.log('🚀 ~ Mutation normalized error:', normalizedError)
       errorHandler(error, {
         400: (errorData) => {
-          console.log("🚀 ~ 400 error handler in Mutation:", errorData)
-        }
+          console.log('🚀 ~ 400 error handler in Mutation:', errorData)
+        },
       })
     }
   },
 })
 
 if (error.value) {
-  console.log("🚀 ~ nuxt error is instanceof Error:", error.value instanceof Error)
-  console.log("🚀 ~ nuxt error is:", error.value)
+  console.log('🚀 ~ nuxt error is instanceof Error:', error.value instanceof Error)
+  console.log('🚀 ~ nuxt error is:', error.value)
   errorHandler(error.value)
 }
 </script>

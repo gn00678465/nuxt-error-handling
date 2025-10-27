@@ -33,11 +33,11 @@ describe('useErrorHandling', () => {
         request: '/api/test',
         options: {},
         status: 404,
-        data: { message: 'Resource not found' }
+        data: { message: 'Resource not found' },
       }) as FetchError<{ message: string }>
 
       errorHandler(error, {
-        '404': handler404
+        404: handler404,
       })
 
       expect(handler404).toHaveBeenCalledTimes(1)
@@ -50,11 +50,11 @@ describe('useErrorHandling', () => {
 
       const error = Object.assign(new Error('Server Error'), {
         statusCode: 500,
-        data: { error: 'Internal server error' }
+        data: { error: 'Internal server error' },
       }) as NuxtError<{ error: string }>
 
       errorHandler(error, {
-        '500': handler500
+        500: handler500,
       })
 
       expect(handler500).toHaveBeenCalledTimes(1)
@@ -69,11 +69,11 @@ describe('useErrorHandling', () => {
         request: '/api/user',
         options: {},
         status: 401,
-        data: { message: 'Token expired' }
+        data: { message: 'Token expired' },
       }) as FetchError<{ message: string }>
 
       errorHandler(error, {
-        '401': handler401
+        401: handler401,
       })
 
       expect(handler401).toHaveBeenCalledTimes(1)
@@ -88,11 +88,11 @@ describe('useErrorHandling', () => {
         request: '/api/admin',
         options: {},
         status: 403,
-        data: { message: 'Access denied' }
+        data: { message: 'Access denied' },
       }) as FetchError<{ message: string }>
 
       errorHandler(error, {
-        '403': handler403
+        403: handler403,
       })
 
       expect(handler403).toHaveBeenCalledTimes(1)
@@ -106,11 +106,11 @@ describe('useErrorHandling', () => {
       const error = Object.assign(new Error('Not Found'), {
         request: '/api/test',
         options: {},
-        status: 404
+        status: 404,
       }) as FetchError
 
       errorHandler(error, {
-        '404': handler404
+        404: handler404,
       })
 
       expect(handler404).toHaveBeenCalledTimes(1)
@@ -127,11 +127,11 @@ describe('useErrorHandling', () => {
         request: '/api/test',
         options: {},
         status: 418, // I'm a teapot
-        data: { message: 'Teapot error' }
+        data: { message: 'Teapot error' },
       }) as FetchError<{ message: string }>
 
       errorHandler(error, {
-        DEFAULT: defaultHandler
+        DEFAULT: defaultHandler,
       } as any)
 
       expect(defaultHandler).toHaveBeenCalledTimes(1)
@@ -145,12 +145,12 @@ describe('useErrorHandling', () => {
 
       const error = Object.assign(new Error('Server Error'), {
         statusCode: 500,
-        data: { error: 'Internal error' }
+        data: { error: 'Internal error' },
       }) as NuxtError<{ error: string }>
 
       errorHandler(error, {
-        '404': handler404,
-        DEFAULT: defaultHandler
+        404: handler404,
+        DEFAULT: defaultHandler,
       } as any)
 
       expect(handler404).not.toHaveBeenCalled()
@@ -167,12 +167,12 @@ describe('useErrorHandling', () => {
         request: '/api/test',
         options: {},
         status: 404,
-        data: { message: 'Not found' }
+        data: { message: 'Not found' },
       }) as FetchError<{ message: string }>
 
       errorHandler(error, {
-        '404': handler404,
-        DEFAULT: defaultHandler
+        404: handler404,
+        DEFAULT: defaultHandler,
       } as any)
 
       expect(handler404).toHaveBeenCalledTimes(1)
@@ -185,15 +185,15 @@ describe('useErrorHandling', () => {
       const originalDefault = vi.fn()
       const { errorHandler } = useErrorHandling({
         handlers: {
-          DEFAULT: originalDefault
-        }
+          DEFAULT: originalDefault,
+        },
       })
 
       const error = Object.assign(new Error('Some Error'), {
         request: '/api/test',
         options: {},
         status: 418,
-        data: { message: 'Error' }
+        data: { message: 'Error' },
       }) as FetchError<{ message: string }>
 
       errorHandler(error)
@@ -206,16 +206,16 @@ describe('useErrorHandling', () => {
       const original404 = vi.fn()
       const { errorHandler } = useErrorHandling({
         handlers: {
-          '404': original404,
-          DEFAULT: () => {}
-        }
+          404: original404,
+          DEFAULT: () => {},
+        },
       })
 
       const error = Object.assign(new Error('Not Found'), {
         request: '/api/test',
         options: {},
         status: 404,
-        data: { message: 'Not found' }
+        data: { message: 'Not found' },
       }) as FetchError<{ message: string }>
 
       errorHandler(error)
@@ -228,20 +228,20 @@ describe('useErrorHandling', () => {
       const runtime404 = vi.fn()
       const { errorHandler } = useErrorHandling({
         handlers: {
-          '404': original404,
-          DEFAULT: () => {}
-        }
+          404: original404,
+          DEFAULT: () => {},
+        },
       })
 
       const error = Object.assign(new Error('Not Found'), {
         request: '/api/test',
         options: {},
         status: 404,
-        data: { message: 'Not found' }
+        data: { message: 'Not found' },
       }) as FetchError<{ message: string }>
 
       errorHandler(error, {
-        '404': runtime404
+        404: runtime404,
       })
 
       expect(runtime404).toHaveBeenCalledTimes(1)
@@ -253,29 +253,29 @@ describe('useErrorHandling', () => {
       const runtime500 = vi.fn()
       const { errorHandler } = useErrorHandling({
         handlers: {
-          '404': original404,
-          DEFAULT: () => {}
-        }
+          404: original404,
+          DEFAULT: () => {},
+        },
       })
 
       const error404 = Object.assign(new Error('Not Found'), {
         request: '/api/test',
         options: {},
         status: 404,
-        data: { message: 'Not found' }
+        data: { message: 'Not found' },
       }) as FetchError<{ message: string }>
 
       const error500 = Object.assign(new Error('Server Error'), {
         statusCode: 500,
-        data: { error: 'Server error' }
+        data: { error: 'Server error' },
       }) as NuxtError<{ error: string }>
 
       errorHandler(error404, {
-        '500': runtime500
+        500: runtime500,
       })
 
       errorHandler(error500, {
-        '500': runtime500
+        500: runtime500,
       })
 
       expect(original404).toHaveBeenCalledTimes(1)
@@ -288,19 +288,19 @@ describe('useErrorHandling', () => {
       const defaultHandler = vi.fn()
       const { errorHandler } = useErrorHandling({
         handlers: {
-          DEFAULT: defaultHandler
-        }
+          DEFAULT: defaultHandler,
+        },
       })
 
       const error = Object.assign(new Error('Not Found'), {
         request: '/api/test',
         options: {},
         status: 404,
-        data: { message: 'Not found' }
+        data: { message: 'Not found' },
       }) as FetchError<{ message: string }>
 
       // 運行時僅提供其他狀態碼處理器，未提供 DEFAULT
-      const handlersWithoutDefault = { '500': () => {} }
+      const handlersWithoutDefault = { 500: () => {} }
 
       expect(() => errorHandler(error, handlersWithoutDefault)).not.toThrow()
       expect(defaultHandler).toHaveBeenCalledTimes(1)
@@ -310,8 +310,8 @@ describe('useErrorHandling', () => {
     it('應該在錯誤無效時拋出原始錯誤', () => {
       const { errorHandler } = useErrorHandling({
         handlers: {
-          DEFAULT: () => {}
-        }
+          DEFAULT: () => {},
+        },
       })
 
       const invalidError = { invalid: 'object' }
@@ -323,15 +323,15 @@ describe('useErrorHandling', () => {
       const defaultHandler = vi.fn()
       const { errorHandler } = useErrorHandling({
         handlers: {
-          DEFAULT: defaultHandler
-        }
+          DEFAULT: defaultHandler,
+        },
       })
 
       const error = Object.assign(new Error('Not Found'), {
         request: '/api/test',
         options: {},
         status: 404,
-        data: { message: 'Not found' }
+        data: { message: 'Not found' },
       }) as FetchError<{ message: string }>
 
       expect(() => errorHandler(error)).not.toThrow()
@@ -350,12 +350,12 @@ describe('useErrorHandling', () => {
         response: {
           status: 404,
           statusText: 'Not Found',
-          _data: { message: 'Resource not found' }
-        }
+          _data: { message: 'Resource not found' },
+        },
       }) as FetchError<{ message: string }>
 
       errorHandler(error, {
-        '404': handler404
+        404: handler404,
       })
 
       expect(handler404).toHaveBeenCalledTimes(1)
@@ -369,11 +369,11 @@ describe('useErrorHandling', () => {
       const error = Object.assign(new Error('Nuxt error'), {
         statusCode: 500,
         statusMessage: 'Internal Server Error',
-        data: { error: 'Something went wrong' }
+        data: { error: 'Something went wrong' },
       }) as NuxtError<{ error: string }>
 
       errorHandler(error, {
-        '500': handler500
+        500: handler500,
       })
 
       expect(handler500).toHaveBeenCalledTimes(1)
@@ -386,11 +386,11 @@ describe('useErrorHandling', () => {
 
       const error = Object.assign(new Error('Nuxt error'), {
         status: 404,
-        data: { message: 'Page not found' }
+        data: { message: 'Page not found' },
       }) as unknown as NuxtError<{ message: string }>
 
       errorHandler(error, {
-        '404': handler404
+        404: handler404,
       })
 
       expect(handler404).toHaveBeenCalledTimes(1)
@@ -404,7 +404,7 @@ describe('useErrorHandling', () => {
       const error = new Error('Standard error')
 
       errorHandler(error, {
-        DEFAULT: defaultHandler
+        DEFAULT: defaultHandler,
       } as any)
 
       expect(defaultHandler).toHaveBeenCalledTimes(1)
@@ -421,11 +421,11 @@ describe('useErrorHandling', () => {
         request: '/api/test',
         options: {},
         status: 0,
-        data: { message: 'Network failed' }
+        data: { message: 'Network failed' },
       }) as FetchError<{ message: string }>
 
       errorHandler(error, {
-        DEFAULT: defaultHandler
+        DEFAULT: defaultHandler,
       } as any)
 
       expect(defaultHandler).toHaveBeenCalledTimes(1)
@@ -441,13 +441,13 @@ describe('useErrorHandling', () => {
         request: '/api/test',
         options: {},
         status: 404,
-        data: { message: 'Not found' }
+        data: { message: 'Not found' },
       }) as FetchError<{ message: string }>
 
       errorHandler(error, {
-        '404': handler404,
-        '500': handler500,
-        DEFAULT: defaultHandler
+        404: handler404,
+        500: handler500,
+        DEFAULT: defaultHandler,
       } as any)
 
       expect(handler404).toHaveBeenCalledTimes(1)
@@ -463,11 +463,11 @@ describe('useErrorHandling', () => {
         request: '/api/test',
         options: {},
         status: 404,
-        data: null
+        data: null,
       }) as FetchError<null>
 
       errorHandler(error, {
-        '404': handler404
+        404: handler404,
       })
 
       expect(handler404).toHaveBeenCalledTimes(1)
@@ -480,7 +480,7 @@ describe('useErrorHandling', () => {
       const { errorHandler } = useErrorHandling()
 
       interface ValidationError {
-        errors: Array<{ field: string; message: string }>
+        errors: Array<{ field: string, message: string }>
         timestamp: number
       }
 
@@ -491,14 +491,14 @@ describe('useErrorHandling', () => {
         data: {
           errors: [
             { field: 'email', message: 'Invalid email' },
-            { field: 'password', message: 'Too short' }
+            { field: 'password', message: 'Too short' },
           ],
-          timestamp: Date.now()
-        }
+          timestamp: Date.now(),
+        },
       }) as FetchError<ValidationError>
 
       errorHandler(error, {
-        '422': handler422
+        422: handler422,
       })
 
       expect(handler422).toHaveBeenCalledTimes(1)
@@ -506,9 +506,9 @@ describe('useErrorHandling', () => {
         expect.objectContaining({
           errors: expect.arrayContaining([
             expect.objectContaining({ field: 'email' }),
-            expect.objectContaining({ field: 'password' })
-          ])
-        })
+            expect.objectContaining({ field: 'password' }),
+          ]),
+        }),
       )
     })
   })
@@ -520,7 +520,7 @@ describe('useErrorHandling', () => {
       const fetchError = Object.assign(new Error('Fetch failed'), {
         request: '/api/test',
         options: {},
-        status: 404
+        status: 404,
       })
 
       expect(isFetchError(fetchError)).toBe(true)
@@ -531,7 +531,7 @@ describe('useErrorHandling', () => {
       const { isNuxtError } = useErrorHandling()
 
       const nuxtError = Object.assign(new Error('Nuxt error'), {
-        statusCode: 500
+        statusCode: 500,
       })
 
       expect(isNuxtError(nuxtError)).toBe(true)
@@ -555,7 +555,7 @@ describe('useErrorHandling', () => {
         request: '/api/test',
         options: {},
         status: 404,
-        data: { message: 'Not found' }
+        data: { message: 'Not found' },
       }) as FetchError<{ message: string }>
 
       const normalized = normalizeError(error)
@@ -563,7 +563,7 @@ describe('useErrorHandling', () => {
       expect(normalized).toMatchObject({
         message: 'Test error',
         statusCode: 404,
-        data: { message: 'Not found' }
+        data: { message: 'Not found' },
       })
     })
   })
@@ -584,17 +584,17 @@ describe('useErrorHandling', () => {
         status: 400,
         data: {
           code: 'VALIDATION_ERROR',
-          details: ['Field 1 invalid', 'Field 2 required']
-        }
+          details: ['Field 1 invalid', 'Field 2 required'],
+        },
       }) as FetchError<CustomErrorData>
 
       errorHandler(error, {
-        '400': handler
+        400: handler,
       })
 
       expect(handler).toHaveBeenCalledWith({
         code: 'VALIDATION_ERROR',
-        details: ['Field 1 invalid', 'Field 2 required']
+        details: ['Field 1 invalid', 'Field 2 required'],
       })
     })
   })
