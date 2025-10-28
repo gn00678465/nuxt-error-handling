@@ -6,8 +6,8 @@ export interface ModuleOptions {}
 
 export default defineNuxtModule<ModuleOptions>({
   meta: {
-    name: name,
-    version: version,
+    name,
+    version,
     configKey: 'errorHandling',
   },
   defaults: {},
