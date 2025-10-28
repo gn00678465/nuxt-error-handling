@@ -16,17 +16,18 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "lts/*"
       # 建立 Node.js 環境，因為 semantic-release 通常依賴 Node.js。
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v2
+
       - name: Install dependencies
         run: pnpm install
       # pnpm install 以執行 semantic-release。
 
       - name: Run Semantic Release
-        uses: semantic-release/semantic-release@v19
+        run: pnpm semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       # 使用 semantic-release 自動管理版本號和創 GitHub Release。
