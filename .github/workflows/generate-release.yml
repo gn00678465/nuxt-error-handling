@@ -3,7 +3,7 @@ name: 'Generate Release'
 on:
   push:
     branches:
-	    - main
+      - main
 
 jobs:
   release:
