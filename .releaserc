@@ -38,12 +38,7 @@
     "@semantic-release/changelog",
     "@semantic-release/git",
     [
-      "@semantic-release/github",
-      {
-        "release": {
-          "name": "Release version ${nextRelease.version}"
-        }
-      }
+      "@semantic-release/github"
     ]
   ]
 }
