@@ -8,7 +8,7 @@ export default defineNuxtPlugin((_nuxtApp) => {
       // 在這裡處理錯誤
       const data = normalizeError<T>(error)
       if (data.statusCode && data.statusCode.toString() in handlers) {
-        handlers[data.statusCode.toString() as keyof Handlers<T>]?.(data.data)
+        handlers[data.statusCode.toString() as keyof Handlers<T>]?.(data.data, error)
         return
       }
     }
