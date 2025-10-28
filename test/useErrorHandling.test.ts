@@ -41,7 +41,7 @@ describe('useErrorHandling', () => {
       })
 
       expect(handler404).toHaveBeenCalledTimes(1)
-      expect(handler404).toHaveBeenCalledWith({ message: 'Resource not found' })
+      expect(handler404).toHaveBeenCalledWith({ message: 'Resource not found' }, error)
     })
 
     it('應該調用對應狀態碼的處理器 (500)', () => {
@@ -58,7 +58,7 @@ describe('useErrorHandling', () => {
       })
 
       expect(handler500).toHaveBeenCalledTimes(1)
-      expect(handler500).toHaveBeenCalledWith({ error: 'Internal server error' })
+      expect(handler500).toHaveBeenCalledWith({ error: 'Internal server error' }, error)
     })
 
     it('應該處理 401 未授權錯誤', () => {
@@ -77,7 +77,7 @@ describe('useErrorHandling', () => {
       })
 
       expect(handler401).toHaveBeenCalledTimes(1)
-      expect(handler401).toHaveBeenCalledWith({ message: 'Token expired' })
+      expect(handler401).toHaveBeenCalledWith({ message: 'Token expired' }, error)
     })
 
     it('應該處理 403 禁止訪問錯誤', () => {
@@ -96,7 +96,7 @@ describe('useErrorHandling', () => {
       })
 
       expect(handler403).toHaveBeenCalledTimes(1)
-      expect(handler403).toHaveBeenCalledWith({ message: 'Access denied' })
+      expect(handler403).toHaveBeenCalledWith({ message: 'Access denied' }, error)
     })
 
     it('應該處理沒有 data 的錯誤', () => {
@@ -114,7 +114,7 @@ describe('useErrorHandling', () => {
       })
 
       expect(handler404).toHaveBeenCalledTimes(1)
-      expect(handler404).toHaveBeenCalledWith(undefined)
+      expect(handler404).toHaveBeenCalledWith(undefined, error)
     })
   })
 
@@ -135,7 +135,7 @@ describe('useErrorHandling', () => {
       } as any)
 
       expect(defaultHandler).toHaveBeenCalledTimes(1)
-      expect(defaultHandler).toHaveBeenCalledWith({ message: 'Teapot error' })
+      expect(defaultHandler).toHaveBeenCalledWith({ message: 'Teapot error' }, error)
     })
 
     it('應該在有狀態碼但沒有對應處理器時調用 DEFAULT', () => {
@@ -155,7 +155,7 @@ describe('useErrorHandling', () => {
 
       expect(handler404).not.toHaveBeenCalled()
       expect(defaultHandler).toHaveBeenCalledTimes(1)
-      expect(defaultHandler).toHaveBeenCalledWith({ error: 'Internal error' })
+      expect(defaultHandler).toHaveBeenCalledWith({ error: 'Internal error' }, error)
     })
 
     it('應該優先使用狀態碼處理器而非 DEFAULT', () => {
@@ -199,7 +199,7 @@ describe('useErrorHandling', () => {
       errorHandler(error)
 
       expect(originalDefault).toHaveBeenCalledTimes(1)
-      expect(originalDefault).toHaveBeenCalledWith({ message: 'Error' })
+      expect(originalDefault).toHaveBeenCalledWith({ message: 'Error' }, error)
     })
 
     it('應該使用初始化時提供的狀態碼處理器', () => {
@@ -304,7 +304,7 @@ describe('useErrorHandling', () => {
 
       expect(() => errorHandler(error, handlersWithoutDefault)).not.toThrow()
       expect(defaultHandler).toHaveBeenCalledTimes(1)
-      expect(defaultHandler).toHaveBeenCalledWith({ message: 'Not found' })
+      expect(defaultHandler).toHaveBeenCalledWith({ message: 'Not found' }, error)
     })
 
     it('應該在錯誤無效時拋出原始錯誤', () => {
@@ -359,7 +359,7 @@ describe('useErrorHandling', () => {
       })
 
       expect(handler404).toHaveBeenCalledTimes(1)
-      expect(handler404).toHaveBeenCalledWith({ message: 'Resource not found' })
+      expect(handler404).toHaveBeenCalledWith({ message: 'Resource not found' }, error)
     })
 
     it('應該處理 NuxtError (使用 statusCode)', () => {
@@ -377,7 +377,7 @@ describe('useErrorHandling', () => {
       })
 
       expect(handler500).toHaveBeenCalledTimes(1)
-      expect(handler500).toHaveBeenCalledWith({ error: 'Something went wrong' })
+      expect(handler500).toHaveBeenCalledWith({ error: 'Something went wrong' }, error)
     })
 
     it('應該處理 NuxtError (使用 status)', () => {
@@ -394,7 +394,7 @@ describe('useErrorHandling', () => {
       })
 
       expect(handler404).toHaveBeenCalledTimes(1)
-      expect(handler404).toHaveBeenCalledWith({ message: 'Page not found' })
+      expect(handler404).toHaveBeenCalledWith({ message: 'Page not found' }, error)
     })
 
     it('應該處理標準 Error', () => {
@@ -408,7 +408,7 @@ describe('useErrorHandling', () => {
       } as any)
 
       expect(defaultHandler).toHaveBeenCalledTimes(1)
-      expect(defaultHandler).toHaveBeenCalledWith(undefined)
+      expect(defaultHandler).toHaveBeenCalledWith(undefined, error)
     })
   })
 
@@ -472,7 +472,7 @@ describe('useErrorHandling', () => {
 
       expect(handler404).toHaveBeenCalledTimes(1)
       // null 或 undefined 都會被標準化為 undefined
-      expect(handler404).toHaveBeenCalledWith(undefined)
+      expect(handler404).toHaveBeenCalledWith(undefined, error)
     })
 
     it('應該處理複雜的 data 結構', () => {
@@ -509,6 +509,7 @@ describe('useErrorHandling', () => {
             expect.objectContaining({ field: 'password' }),
           ]),
         }),
+        error,
       )
     })
   })
@@ -595,7 +596,7 @@ describe('useErrorHandling', () => {
       expect(handler).toHaveBeenCalledWith({
         code: 'VALIDATION_ERROR',
         details: ['Field 1 invalid', 'Field 2 required'],
-      })
+      }, error)
     })
   })
 })

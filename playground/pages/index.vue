@@ -4,8 +4,9 @@ import { useMutation } from '@tanstack/vue-query'
 const { $validateError, $normalizeError } = useNuxtApp()
 const { errorHandler, validateError } = useErrorHandling({
   handlers: {
-    DEFAULT(errorData) {
+    DEFAULT(errorData, error) {
       console.log('🚀 ~ DEFAULT error handler:', errorData)
+      console.log('🚀 ~ Original error:', error)
     },
   },
 })
