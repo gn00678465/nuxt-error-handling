@@ -19,6 +19,8 @@ jobs:
           node-version: '20'
       # 建立 Node.js 環境，因為 semantic-release 通常依賴 Node.js。
 
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v2
       - name: Install dependencies
         run: pnpm install
       # pnpm install 以執行 semantic-release。
