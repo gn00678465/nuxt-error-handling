@@ -1,13 +1,3 @@
-<!--
-Get your module up and running quickly.
-
-Find and replace all on all files (CMD+SHIFT+F):
-- Name: My Module
-- Package name: my-module
-- Description: My new Nuxt module
--->
-
-
 # @nuxtjs/error-handling
 
 一個為 Nuxt 4 打造的輕量錯誤處理模組，目標是提供統一且可擴充的錯誤處理機制。模組可辨識常見的錯誤來源（例如 FetchError、NuxtError 與一般 Error），並允許您依 HTTP 狀態碼指定不同的處理器（handler）。
@@ -21,7 +11,7 @@ Find and replace all on all files (CMD+SHIFT+F):
 
 ## 安裝
 
-### Option1: 從 github 安裝
+### Option 1: 從 github 安裝
 
 ```bash
 pnpm add gn00678465/nuxt-error-handling
@@ -33,7 +23,7 @@ export default defineNuxtConfig({
 })
 ```
 
-### Options2: 本地端
+### Options 2: 本地端
 
 在本地開發或從原始碼測試，可在 `nuxt.config.ts` 中直接引用本套件的路徑（playground 範例）：
 
@@ -75,7 +65,7 @@ NormalizedError（由 `normalizeError` 回傳）的欄位：
 
 以下範例包含三個場景：
 
-1. 在 `useAsyncData` 中，將 fetch 的錯誤轉為 NuxtError 並交由 Nuxt 的錯誤頁面處理。
+1. 在 `useAsyncData` 中, 將 fetch 的錯誤轉為 NuxtError 並交由 Nuxt 的錯誤頁面處理。
 2. 使用其他第三方: 如 vue-query `useMutation` 在 onError 中用 `errorHandler` 針對特定 status 做處理。
 3. 在元件中直接使用 `errorHandler` 呼叫預設處理。
 
