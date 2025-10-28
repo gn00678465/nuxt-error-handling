@@ -1,7 +1,7 @@
 {
   "name": "@nuxtjs/error-handling",
   "version": "1.0.0",
-  "description": "My new Nuxt module",
+  "description": "一個 Nuxt 模組，提供統一的錯誤處理機制，支持 FetchError、NuxtError 和標準錯誤，並允許根據 HTTP 狀態碼自定義錯誤處理邏輯。",
   "repository": "gn00678465/nuxt-error-handling",
   "license": "MIT",
   "type": "module",
