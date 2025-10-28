@@ -1,11 +1,13 @@
 import { defineNuxtModule, addPlugin, createResolver, addImportsDir } from '@nuxt/kit'
+import { name, version } from '../package.json'
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface ModuleOptions {}
 
 export default defineNuxtModule<ModuleOptions>({
   meta: {
-    name: '@nuxtjs/error-handling',
+    name,
+    version,
     configKey: 'errorHandling',
   },
   defaults: {},
