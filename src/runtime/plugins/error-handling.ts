@@ -3,8 +3,13 @@ import { defineNuxtPlugin } from '#app'
 import { isFetchError, isNuxtError, validateError, normalizeError } from '../utils/error-handling'
 
 export default defineNuxtPlugin((_nuxtApp) => {
+  /**
+   * 錯誤處理組合函數
+   * @param originalHandlers - 錯誤處理的配置選項。
+   * @returns errorHandler function
+   */
   function defineErrorHandler<T = unknown>(originalHandlers: HandlersWithDefault<T> = { DEFAULT: (_data, _error) => {} }) {
-    return function errorHandler<T>(error: unknown, handlers: Handlers<T> = {}) {
+    return function errorHandler(error: unknown, handlers: Handlers<T> = {}) {
       // 使用類型斷言合併處理器，因為運行時它們處理的是相同錯誤
       const mergedHandlers = { ...originalHandlers, ...handlers } as Handlers<T> & { DEFAULT?: (data: T | undefined, error?: unknown) => void }
 
