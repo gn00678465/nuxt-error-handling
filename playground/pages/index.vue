@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { useMutation } from '@tanstack/vue-query'
 
-const { $validateError, $normalizeError } = useNuxtApp()
-const { errorHandler, validateError } = useErrorHandling({
+const { errorHandler, validateError, normalizeError } = useErrorHandling({
   handlers: {
     DEFAULT(errorData, error) {
       console.log('🚀 ~ DEFAULT error handler:', errorData)
@@ -16,8 +15,8 @@ const { data, error, refresh } = await useAsyncData('error-example', async () =>
     retry: 0,
     method: 'GET',
   }).catch((error) => {
-    if ($validateError<unknown>(error)) {
-      const normalizedError = $normalizeError(error)
+    if (validateError<unknown>(error)) {
+      const normalizedError = normalizeError(error)
       throw createError({
         ...normalizedError,
         message: `Custom Error Message: ${normalizedError.message}`,
@@ -40,7 +39,7 @@ const { mutate } = useMutation({
   },
   onError: (error) => {
     if (validateError<unknown>(error)) {
-      const normalizedError = $normalizeError(error)
+      const normalizedError = normalizeError(error)
       console.log('🚀 ~ Mutation normalized error:', normalizedError)
       errorHandler(error, {
         400: (errorData) => {
