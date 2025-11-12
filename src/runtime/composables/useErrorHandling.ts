@@ -1,9 +1,8 @@
-import type { Handlers, HandlersWithDefault } from '../types/handler'
+import type { Handlers } from '../types/handler'
+import type { ErrorHandlingDefaultOptions } from '../types/options'
 import { isFetchError, isNuxtError, validateError, normalizeError } from '../utils/error-handling'
 
-export interface UseErrorHandlingOptions<TDefault> {
-  handlers?: HandlersWithDefault<TDefault>
-}
+export type UseErrorHandlingOptions<TDefault> = ErrorHandlingDefaultOptions<TDefault>
 
 /**
  * 錯誤處理組合函數
