@@ -40,7 +40,7 @@ export default defineNuxtConfig({
 - `$validateError(error)`：驗證傳入是否為已支援的錯誤（FetchError / NuxtError / Error），若不是會丟錯。
 - `$isFetchError(error)`、`$isNuxtError(error)`：判斷錯誤來源。
 - `$normalizeError(error)`：將錯誤標準化為可讀的結構（見下方）。
-- `$errorHandler(error, handlers)`：全域錯誤處理函式，會檢查錯誤的 `statusCode`，若有對應的 `handlers['<status>']` 則呼叫它。
+- `$defineErrorHandler(handlers)`：定義錯誤處理器工廠函式，可預先設定預設處理器，回傳一個 `errorHandler` 函式用於處理錯誤。
 
 此外，模組提供 `useErrorHandling()` 組合函式，可在 setup 中直接使用相同的工具（不需使用 `$` 前綴）：
 

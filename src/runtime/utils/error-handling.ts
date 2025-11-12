@@ -1,5 +1,6 @@
 import type { FetchError, FetchContext, FetchResponse } from 'ofetch'
 import type { NuxtError } from '#app'
+import type { NormalizedError, ErrorTransformCallback } from '../types/normalizedError'
 
 /**
  * 驗證錯誤類型並返回是否為有效錯誤
@@ -71,26 +72,6 @@ export function isNuxtError<DataT = unknown>(error: unknown): error is NuxtError
     && 'message' in err
   )
 }
-
-/**
- * 標準化錯誤對象的介面
- */
-export interface NormalizedError<T = unknown> {
-  cause?: unknown
-  data?: T
-  message: string
-  name: string
-  stack?: string
-  statusCode?: number
-  statusMessage?: string
-}
-
-/**
- * 錯誤轉換回調函式類型
- */
-export type ErrorTransformCallback<T = unknown, R = NormalizedError<T>> = (
-  normalized: NormalizedError<T>,
-) => R
 
 /**
  * 將錯誤物件標準化為統一格式

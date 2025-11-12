@@ -1,6 +1,4 @@
-import type { StatusCodes as SC } from './status-codes'
-
-type StatusCodes = `${SC}`
+import type { StatusCodes as SC } from './statusCodes'
 
 /**
  * 處理錯誤資料的處理器函數。
@@ -9,7 +7,7 @@ type StatusCodes = `${SC}`
  */
 type Handler<T> = (errorData: T | undefined, error?: unknown) => void
 
-export type Handlers<T = unknown> = Partial<Record<StatusCodes, Handler<T>>>
+export type Handlers<T = unknown> = Partial<Record<`${SC}`, Handler<T>>>
 
 export type HandlersWithDefault<T = unknown> = Handlers<T> & {
   DEFAULT: Handler<T>
