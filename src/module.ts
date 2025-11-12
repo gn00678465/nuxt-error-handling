@@ -32,8 +32,6 @@ export default defineNuxtModule<ModuleOptions>({
         ${handler.replaceAll('export ', '')}
         }
         `
-
-        return `${normalizedError}\n${handler}`
       },
     })
   },
