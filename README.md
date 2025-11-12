@@ -33,6 +33,20 @@ export default defineNuxtConfig({
 })
 ```
 
+## 型別載入
+
+模組提供的型別可透過 `nuxt/error-handling` 模組匯入：
+
+```ts
+import type { NormalizedError, Handlers, HandlersWithDefault } from 'nuxt/error-handling'
+```
+
+主要型別：
+
+- `NormalizedError<T>`：標準化錯誤物件介面
+- `Handlers<T>`：錯誤處理器集合（依 HTTP status code）
+- `HandlersWithDefault<T>`：包含 DEFAULT 處理器的錯誤處理器集合
+
 ## 主要 API 與型別概述
 
 模組會在 Nuxt 應用中透過 plugin 提供下列工具（可透過 `useNuxtApp()` 存取）：
@@ -63,20 +77,47 @@ NormalizedError（由 `normalizeError` 回傳）的欄位：
 
 ## 使用範例
 
-以下範例包含三個場景：
+以下範例包含四個場景：
 
-1. 在 `useAsyncData` 中, 將 fetch 的錯誤轉為 NuxtError 並交由 Nuxt 的錯誤頁面處理。
-2. 使用其他第三方: 如 vue-query `useMutation` 在 onError 中用 `errorHandler` 針對特定 status 做處理。
-3. 在元件中直接使用 `errorHandler` 呼叫預設處理。
+1. 使用 `$defineErrorHandler` 預先定義錯誤處理器（推薦方式）
+2. 在 `useAsyncData` 中, 將 fetch 的錯誤轉為 NuxtError 並交由 Nuxt 的錯誤頁面處理。
+3. 使用其他第三方: 如 vue-query `useMutation` 在 onError 中用 `errorHandler` 針對特定 status 做處理。
+4. 使用組合函式 `useErrorHandling` 直接在 setup 中使用。
 
 示範程式片段（Typescript / setup）：
 
 ```ts
-// 透過 useNuxtApp() 存取 plugin 提供的變數
-const { $validateError, $normalizeError } = useNuxtApp()
+// 範例 1：使用 $defineErrorHandler 預先定義處理器（推薦）
+const { $defineErrorHandler, $normalizeError } = useNuxtApp()
 
-// 使用組合函式（在 setup 中）
-const { errorHandler, validateError } = useErrorHandling({
+const errorHandler = $defineErrorHandler({
+  handlers: {
+    '404'(errorData, error) {
+      console.log('404 Not Found:', errorData)
+    },
+    '500'(errorData, error) {
+      console.log('500 Server Error:', errorData)
+    },
+    DEFAULT(errorData, error) {
+      console.log('Default error handler:', errorData)
+      console.log('Original error:', error)
+    },
+  },
+})
+
+// 在 useAsyncData 中使用預先定義的 errorHandler
+const { data, refresh } = await useAsyncData('error-example', async () => {
+  return await $fetch('https://dummyjson.com/http/404/Hello_Peter', {
+    retry: 0,
+    method: 'GET',
+  }).catch(errorHandler)
+}, {
+  server: true,
+  lazy: true,
+})
+
+// 範例 2：使用組合函式（在 setup 中）
+const { errorHandler: handler2, validateError } = useErrorHandling({
   handlers: {
     DEFAULT(errorData, error) {
       console.log('DEFAULT error handler', errorData, error)
@@ -84,7 +125,9 @@ const { errorHandler, validateError } = useErrorHandling({
   },
 })
 
-// 範例：在 useAsyncData 裡處理 fetch 的錯誤，並將其轉成 Nuxt 的 createError()
+// 範例 3：在 useAsyncData 裡處理 fetch 的錯誤，並將其轉成 Nuxt 的 createError()
+const { $validateError, $normalizeError } = useNuxtApp()
+
 const { data, error, refresh } = await useAsyncData('error-example', async () => {
   return await $fetch('https://example.com/404', { retry: 0 }).catch((err) => {
     if ($validateError(err)) {
@@ -99,29 +142,23 @@ const { data, error, refresh } = await useAsyncData('error-example', async () =>
   })
 }, { server: true, lazy: true })
 
-// 範例：在 mutation 的 onError 中，使用 validate + normalize 並依狀態碼分流
+// 範例 4：在 mutation 的 onError 中，使用 errorHandler 並可動態覆蓋特定狀態碼的處理
 const { mutate } = useMutation({
   mutationFn: async (payload: string) => $fetch(`https://example.com/400/${payload}`, { method: 'POST' }),
   onError(error) {
-    if (validateError(error)) {
-      const normalized = normalizeError(error)
-      errorHandler(error, {
-        400: (data) => {
-          console.log('400 handler', data)
-        },
-      })
-    }
+    // 可以使用已定義的 errorHandler，並動態添加額外的狀態碼處理器
+    handler2(error, {
+      '400': (data) => {
+        console.log('400 Bad Request handler', data)
+      },
+    })
   },
 })
-
-// 若頁面上的 `error`（Nuxt error store）存在，也可直接傳入 errorHandler
-if (error.value) {
-  errorHandler(error.value)
-}
 ```
 
 重點說明：
 
+- **推薦使用 `$defineErrorHandler`**：可預先設定多個狀態碼處理器與預設處理器，返回的 `errorHandler` 可在整個元件中重複使用。
 - `validateError` / `isFetchError` / `isNuxtError` 幫助你在不同情境（fetch、mutation、server）先判斷錯誤類型。
 - `normalizeError` 會把不同來源的錯誤轉成一致的欄位，方便 handler 使用。
 - `errorHandler` 會優先嘗試依 `statusCode` 分流，若未命中則可使用 `DEFAULT` 處理器。
@@ -129,7 +166,7 @@ if (error.value) {
 ## 常見用法摘要
 
 - 全域工具：
-  - `useNuxtApp()` 可取得 `$validateError`、`$normalizeError`、`$errorHandler`（plugin 提供）
+  - `useNuxtApp()` 可取得 `$validateError`、`$normalizeError`、`$defineErrorHandler`（plugin 提供）
 - 組合函式：
   - `useErrorHandling()` 在 setup 內直接使用（回傳 `errorHandler` 與判斷/標準化工具）
 
